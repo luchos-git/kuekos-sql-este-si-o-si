@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="contenedor">
+        <header><h1>Juegos</h1></header>
+        <p class="mensaje">mensaje</p>
+        <main>
+            <button id="b-agregar">agregar Juegos</button>
+            <section id="formulario">
+                <form action="" id="buscar">
+                    <h3> buscar Juegos</h3>
+                    <input type="text" name="titulo" placeholder="ingrese el titulo que busca">
+                    <select name="genero" id="buscar-genero"></select>
+                    <select name="consola" id="buscar-consola"></select>
+                    <input type="submit" name="submit" value="buscar">
+                </form>
+
+                <form action="" id="agregar">
+    <h3>agregar juego</h3>
+    <input type="text" name="titulo" placeholder="ingrese titulo" required>
+
+    <select name="genero" id="agregar-genero" required></select>
+    <input type="text" id="agregar-genero-otro" placeholder="ingrese nuevo genero" class="campo-otro">
+
+    <select name="consola" id="agregar-consola" required></select>
+    <input type="text" id="agregar-consola-otro" placeholder="ingrese nueva consola" class="campo-otro">
+
+    <input type="submit" name="submit" value="agregar">
+    <button type="button" id="b-cancelar-agregar">Cancelar</button>
+</form>
+
+                <form action="" id="modificar"></form>
+            </section>
+
+            <section id="listados">
+                <h3>juegos:</h3>
+                <button id="b-inicio" style="display:none;">Volver al inicio</button>
+                <div id="listado"></div>
+            </section>
+            
+        </main>
+        <footer>
+            <p>7°1 prog  grupo a</p>
+            <p>Proy. de Impl. de Sitios Web Dinámicos</p>
+        </footer>
+    </div>
+
+    <script src="js/mostrarMensaje.js"></script>
+    <script src="js/eventos.js"></script>
+    <script src="js/modulos.js"></script>
+</body>
+</html>
