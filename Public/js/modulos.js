@@ -104,8 +104,10 @@ const mostrarJuegos = (juegos = null) => {
     datos.forEach(juego => {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'juego';
+        const urlImagen = juego.imagen || '';
         tarjeta.innerHTML = `
             <div class="juego-info">
+                ${urlImagen ? `<img src="${urlImagen}" alt="Portada de ${juego.titulo}" class="juego-img">` : '<div class="juego-img">Sin imagen</div>'}
                 <div class="juego-datos">
                     <h4>${juego.titulo}</h4>
                     <p><strong>Género:</strong> ${juego.genero}</p>
@@ -179,6 +181,9 @@ const prepararEdicion = (id) => {
     form.innerHTML = `
         <h3>Modificar juego</h3>
         <input type="hidden" name="id" value="${juego.id}">
+        <label for="modificar-imagen">Cambiar portada (opcional)</label>
+        <input type="file" name="imagen" id="modificar-imagen" accept="image/*">
+        ${juego.imagen ? `<img src="${juego.imagen}" alt="Portada actual" class="juego-img">` : '<p>Este juego no tiene portada.</p>'}
         <input type="text" name="titulo" value="${juego.titulo}" placeholder="ingrese titulo" required>
         <select name="genero" id="modificar-genero" required></select>
         <input type="text" id="modificar-genero-otro" placeholder="ingrese nuevo genero" class="campo-otro">
@@ -226,6 +231,9 @@ const modificarJuego = async (datos) => {
         genero: datos.genero,
         consola: datos.consola
     };
+
+    // Solo enviamos imagen si se subió una nueva; si no, MySQL conserva la anterior.
+    if (datos.imagen) juegoActualizado.imagen = datos.imagen;
 
     try {
         const respuesta = await fetch(`/juegos/${datos.id}`, {

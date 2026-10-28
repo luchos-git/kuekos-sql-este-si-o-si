@@ -9,7 +9,7 @@ const PORT = 3000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Permite leer los datos JSON que envían los formularios desde el navegador.
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 // Publicamos HTML, CSS y JavaScript de la carpeta Public.
 app.use(express.static(path.join(__dirname, 'Public')));
 
@@ -40,14 +40,14 @@ app.get('/juegos/:id', async (req, res) => {
 
 // CREATE: recibe los campos del formulario y crea un registro en MySQL.
 app.post('/juegos', async (req, res) => {
-  const { titulo, genero, consola } = req.body;
+  const { titulo, genero, consola, imagen = '' } = req.body;
   if (![titulo, genero, consola].every(v => typeof v === 'string' && v.trim())) {
     return res.status(400).json({ error: 'Título, género y consola son obligatorios' });
   }
   try {
     const [resultado] = await pool.query(
-      'INSERT INTO juegos (titulo, genero, consola) VALUES (?, ?, ?)',
-      [titulo.trim(), genero.trim(), consola.trim()]
+      'INSERT INTO juegos (titulo, genero, consola, imagen) VALUES (?, ?, ?, ?)',
+      [titulo.trim(), genero.trim(), consola.trim(), typeof imagen === 'string' ? imagen : '']
     );
     const [juegos] = await pool.query('SELECT * FROM juegos WHERE id = ?', [resultado.insertId]);
     res.status(201).json(juegos[0]);
@@ -59,15 +59,21 @@ app.post('/juegos', async (req, res) => {
 
 // UPDATE: modifica título, género y consola del juego indicado por su ID.
 app.put('/juegos/:id', async (req, res) => {
-  const { titulo, genero, consola } = req.body;
+  const { titulo, genero, consola, imagen } = req.body;
   if (![titulo, genero, consola].every(v => typeof v === 'string' && v.trim())) {
     return res.status(400).json({ error: 'Título, género y consola son obligatorios' });
   }
   try {
-    const [resultado] = await pool.query(
-      'UPDATE juegos SET titulo = ?, genero = ?, consola = ? WHERE id = ?',
-      [titulo.trim(), genero.trim(), consola.trim(), Number(req.params.id)]
-    );
+    // Si imagen no vino en el JSON, conservamos la URL que ya estaba guardada.
+    const [resultado] = imagen
+      ? await pool.query(
+          'UPDATE juegos SET titulo = ?, genero = ?, consola = ?, imagen = ? WHERE id = ?',
+          [titulo.trim(), genero.trim(), consola.trim(), imagen, Number(req.params.id)]
+        )
+      : await pool.query(
+          'UPDATE juegos SET titulo = ?, genero = ?, consola = ? WHERE id = ?',
+          [titulo.trim(), genero.trim(), consola.trim(), Number(req.params.id)]
+        );
     if (!resultado.affectedRows) return res.status(404).json({ error: 'Juego no encontrado' });
     const [juegos] = await pool.query('SELECT * FROM juegos WHERE id = ?', [Number(req.params.id)]);
     res.json(juegos[0]);
