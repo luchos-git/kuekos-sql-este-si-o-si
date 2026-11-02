@@ -2,10 +2,10 @@ import mysql from 'mysql2/promise';
 
 // Creamos un conjunto de conexiones reutilizables para consultar MySQL.
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'crudo_juegos',
+  host: process.env.MYSQL_ADDON_HOST || 'localhost',
+  user: process.env.MYSQL_ADDON_USER || 'root',
+  password: process.env.MYSQL_ADDON_PASSWORD || '',
+  database: process.env.MYSQL_ADDON_DB || 'crudo_juegos',
   connectionLimit: 5,
 });
 // Comprobamos al iniciar que se pueda establecer conexión con la base de datos.
