@@ -26,6 +26,45 @@ app.get('/juegos', async (req, res) => {
   }
 });
 
+// SEARCH: consulta MySQL usando los filtros del buscador (título, género y consola).
+// Solo agregamos a WHERE los filtros que el usuario completó o seleccionó.
+// Los signos ? y el arreglo de valores protegen la consulta contra SQL injection.
+// Esta ruta debe estar ANTES de /juegos/:id para que 'buscar' no se interprete como un ID.
+app.get('/juegos/buscar', async (req, res) => {
+  try {
+    const { titulo = '', genero = '', consola = '' } = req.query;
+    const condiciones = [];
+    const valores = [];
+
+    if (typeof titulo === 'string' && titulo.trim()) {
+      condiciones.push('titulo LIKE ?');
+      valores.push(`%${titulo.trim()}%`);
+    }
+
+    if (typeof genero === 'string' && genero.trim()) {
+      condiciones.push('genero = ?');
+      valores.push(genero.trim());
+    }
+
+    if (typeof consola === 'string' && consola.trim()) {
+      condiciones.push('consola = ?');
+      valores.push(consola.trim());
+    }
+
+    // Si no hay filtros, devuelve todos los juegos; si hay, los combina con AND.
+    const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
+    const [juegos] = await pool.query(
+      `SELECT * FROM juegos ${where} ORDER BY id DESC`,
+      valores
+    );
+
+    res.json(juegos);
+  } catch (error) {
+    console.error('Error al buscar juegos en MySQL:', error);
+    res.status(500).json({ error: 'No se pudieron buscar los juegos' });
+  }
+});
+
 // READ (uno): busca un juego usando su ID. El signo : indica un parámetro de ruta.
 app.get('/juegos/:id', async (req, res) => {
   try {

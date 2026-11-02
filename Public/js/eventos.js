@@ -114,25 +114,34 @@ document.addEventListener('DOMContentLoaded', () => {
         formulario.style.display = 'none';
     });
 
-    // Filtra los juegos por título, género y consola sin modificar la base de datos.
-    document.querySelector('#buscar').addEventListener('submit', (evento) => {
+    // Busca directamente en MySQL a través del endpoint /juegos/buscar.
+    // El navegador envía los filtros; el servidor arma y ejecuta el SELECT con WHERE.
+    document.querySelector('#buscar').addEventListener('submit', async (evento) => {
         evento.preventDefault();
         const formulario = evento.currentTarget;
-        const titulo = formulario.elements.titulo.value.toLowerCase().trim();
-        const genero = formulario.elements.genero.value;
-        const consola = formulario.elements.consola.value;
+        const parametros = new URLSearchParams({
+            titulo: formulario.elements.titulo.value.trim(),
+            genero: formulario.elements.genero.value,
+            consola: formulario.elements.consola.value
+        });
 
-        const juegosFiltrados = obtenerJuegos().filter(juego =>
-            juego.titulo.toLowerCase().includes(titulo) &&
-            (genero === '' || juego.genero === genero) &&
-            (consola === '' || juego.consola === consola)
-        );
+        try {
+            const respuesta = await fetch(`/juegos/buscar?${parametros.toString()}`);
+            if (!respuesta.ok) throw new Error('Falló la búsqueda en MySQL');
 
-        if (juegosFiltrados.length === 0) {
-            mostrarMensaje('No se encontró el juego');
-            mostrarSinResultados();
-        } else {
-            mostrarJuegos(juegosFiltrados);
+            const juegosEncontrados = await respuesta.json();
+
+            if (juegosEncontrados.length === 0) {
+                mostrarMensaje('No se encontró ningún juego con esos filtros.');
+                mostrarSinResultados();
+            } else {
+                // Mostramos los resultados devueltos por MySQL sin reemplazar la lista completa en caché.
+                mostrarJuegos(juegosEncontrados);
+                mostrarMensaje(`Se encontraron ${juegosEncontrados.length} juego(s).`);
+            }
+        } catch (error) {
+            console.error('Error al buscar juegos:', error);
+            mostrarMensaje('No se pudo realizar la búsqueda. Revisá el servidor y MySQL.');
         }
     });
 
