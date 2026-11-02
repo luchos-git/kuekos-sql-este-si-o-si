@@ -5,7 +5,7 @@
 
 // Devuelve los juegos guardados temporalmente en el navegador.
 const obtenerJuegos = () => JSON.parse(localStorage.getItem("juegos")) || [];
-
+const url = 'https://kuekos-sql-este-si-o-si.onrender.com';
 // Actualiza la caché local. La base de datos se modifica mediante las peticiones fetch.
 const guardarJuegos = (juegos) => {
     localStorage.setItem("juegos", JSON.stringify(juegos));
@@ -14,7 +14,7 @@ const guardarJuegos = (juegos) => {
 // Consulta el servidor local para traer la lista real que está guardada en MySQL.
 const cargarJuegosDesdeApi = async () => {
     try {
-        const respuesta = await fetch('/juegos');
+        const respuesta = await fetch(`${url}/juegos`);
         if (!respuesta.ok) throw new Error('El servidor no pudo consultar los juegos');
 
         const juegos = await respuesta.json();
@@ -137,7 +137,7 @@ const mostrarSinResultados = () => {
 // CREATE: envía los datos ingresados al servidor, que los inserta en la tabla MySQL.
 const agregarJuego = async (nuevoJuego) => {
     try {
-        const respuesta = await fetch('/juegos', {
+        const respuesta = await fetch(`${url}/juegos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(nuevoJuego)
@@ -161,7 +161,7 @@ const eliminarJuego = async (id) => {
 
     try {
         // El ID va en la URL; /juegos/:id es el patrón del servidor, no la URL literal.
-        const respuesta = await fetch(`/juegos/${id}`, { method: 'DELETE' });
+        const respuesta = await fetch(`${url}/juegos/${id}`, { method: 'DELETE' });
         if (!respuesta.ok) throw new Error('El servidor no pudo eliminar el juego');
 
         await cargarJuegosDesdeApi();
@@ -236,7 +236,7 @@ const modificarJuego = async (datos) => {
     if (datos.imagen) juegoActualizado.imagen = datos.imagen;
 
     try {
-        const respuesta = await fetch(`/juegos/${datos.id}`, {
+        const respuesta = await fetch(`${url}/juegos/${datos.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(juegoActualizado)
