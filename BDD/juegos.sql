@@ -16,5 +16,10 @@ CREATE TABLE IF NOT EXISTS `juegos` (
   `titulo` varchar(100) NOT NULL,
   `genero` varchar(50) NOT NULL,
   `consola` varchar(50) NOT NULL,
+  `imagen` varchar(500) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+
+-- Si la tabla ya existía sin la columna imagen, ejecutar:
+-- ALTER TABLE `juegos` ADD COLUMN `imagen` varchar(500) NOT NULL DEFAULT '';

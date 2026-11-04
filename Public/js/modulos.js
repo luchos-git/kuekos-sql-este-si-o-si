@@ -5,7 +5,8 @@
 
 // Devuelve los juegos guardados temporalmente en el navegador.
 const obtenerJuegos = () => JSON.parse(localStorage.getItem("juegos")) || [];
-const url = 'https://kuekos-sql-este-si-o-si.onrender.com';
+// Ruta relativa: el front y la API viven en el mismo servidor, así funciona en Render y en localhost.
+const url = '';
 // Actualiza la caché local. La base de datos se modifica mediante las peticiones fetch.
 const guardarJuegos = (juegos) => {
     localStorage.setItem("juegos", JSON.stringify(juegos));
